@@ -6501,6 +6501,8 @@ def is_line_short_enough(line: Line, *, line_length: int, line_str: str = "") ->
     if not line_str:
         # Force spaces to ensure len(line) is correct
         line_str = line.render(force_spaces=True).strip("\n")
+    else:
+        line_str = line_str.expandtabs(tabsize=4)
     return (
         len(line_str) <= line_length
         and "\n" not in line_str  # multiline strings
