@@ -112,3 +112,13 @@ class TestSimpleFormat(BlackBaseTestCase):
         self.assertFormatEqual(expected, actual)
         black.assert_equivalent(source, actual)
         black.assert_stable(source, actual, black.FileMode(use_tabs=True))
+
+    @patch("black.dump_to_file", dump_to_stderr)
+    def test_line_length_tabs(self) -> None:
+        source, expected = read_data("line_length_tabs")
+        actual = fs(source, mode=black.FileMode(line_length=20, use_tabs=True))
+        self.assertFormatEqual(expected, actual)
+        black.assert_equivalent(source, actual)
+        black.assert_stable(
+            source, actual, black.FileMode(line_length=20, use_tabs=True)
+        )
