@@ -81,6 +81,7 @@ else:
 if TYPE_CHECKING:
     import colorama  # noqa: F401
 
+DEFAULT_TAB_WIDTH = 4
 DEFAULT_LINE_LENGTH = 88
 DEFAULT_EXCLUDES = r"/(\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|venv|\.svn|_build|buck-out|build|dist)/"  # noqa: B950
 DEFAULT_INCLUDES = r"\.pyi?$"
@@ -271,11 +272,17 @@ VERSION_TO_FEATURES: Dict[TargetVersion, Set[Feature]] = {
 @dataclass
 class Mode:
     target_versions: Set[TargetVersion] = field(default_factory=set)
+    indentation: str = "    "
+    tab_width: int = 4
     line_length: int = DEFAULT_LINE_LENGTH
     string_normalization: bool = True
     is_pyi: bool = False
     magic_trailing_comma: bool = True
     experimental_string_processing: bool = False
+
+    @property
+    def use_tabs(self) -> bool:
+        return "\t" in self.indentation
 
     def get_cache_key(self) -> str:
         if self.target_versions:
@@ -404,6 +411,20 @@ def validate_regex(
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option("-c", "--code", type=str, help="Format the code passed in as a string.")
+@click.option(
+    "-T",
+    "--use-tabs",
+    is_flag=True,
+    help="Indent with tabs instead of spaces.",
+)
+@click.option(
+    "-w",
+    "--tab-width",
+    type=int,
+    default=DEFAULT_TAB_WIDTH,
+    help="How many spaces per indentation level.",
+    show_default=True,
+)
 @click.option(
     "-l",
     "--line-length",
@@ -574,6 +595,8 @@ def validate_regex(
 def main(
     ctx: click.Context,
     code: Optional[str],
+    use_tabs: bool,
+    tab_width: int,
     line_length: int,
     target_version: List[TargetVersion],
     check: bool,
@@ -603,6 +626,8 @@ def main(
         versions = set()
     mode = Mode(
         target_versions=versions,
+        indentation="\t" if use_tabs else " " * tab_width,
+        tab_width=tab_width,
         line_length=line_length,
         is_pyi=pyi,
         string_normalization=not skip_string_normalization,
@@ -1851,7 +1876,7 @@ class Line:
         if not self:
             return "\n"
 
-        indent = "    " * self.depth
+        indent = self.mode.indentation * self.depth
         leaves = iter(self.leaves)
         first = next(leaves)
         res = f"{first.prefix}{indent}{first.value}"
@@ -2187,8 +2212,8 @@ class LineGenerator(Visitor[Line]):
             docstring = docstring[quote_len:-quote_len]
 
             if is_multiline_string(leaf):
-                indent = " " * 4 * self.current_line.depth
-                docstring = fix_docstring(docstring, indent)
+                indent = self.mode.indentation * self.current_line.depth
+                docstring = fix_docstring(docstring, indent, not self.mode.use_tabs)
             else:
                 docstring = docstring.strip()
 
@@ -6707,6 +6732,7 @@ def is_line_short_enough(line: Line, *, line_length: int, line_str: str = "") ->
     """
     if not line_str:
         line_str = line_to_string(line)
+    line_str = line_str.expandtabs(tabsize=line.mode.tab_width)
     return (
         len(line_str) <= line_length
         and "\n" not in line_str  # multiline strings
@@ -7057,11 +7083,14 @@ def lines_with_leading_tabs_expanded(s: str) -> List[str]:
     return lines
 
 
-def fix_docstring(docstring: str, prefix: str) -> str:
+def fix_docstring(docstring: str, prefix: str, expand_leading_tabs: bool) -> str:
     # https://www.python.org/dev/peps/pep-0257/#handling-docstring-indentation
     if not docstring:
         return ""
-    lines = lines_with_leading_tabs_expanded(docstring)
+    if expand_leading_tabs:
+        lines = lines_with_leading_tabs_expanded(docstring)
+    else:
+        lines = docstring.splitlines()
     # Determine minimum indentation (first line doesn't count):
     indent = sys.maxsize
     for line in lines[1:]:
