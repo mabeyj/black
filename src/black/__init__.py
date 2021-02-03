@@ -3679,7 +3679,7 @@ class BaseStringSplitter(StringTransformer):
         #   NN: The leaf that is after N.
 
         # WMA4 the whitespace at the beginning of the line.
-        offset = line.depth * 4
+        offset = line.depth * line.mode.tab_width
 
         if is_valid_index(string_idx - 1):
             p_idx = string_idx - 1
@@ -3897,7 +3897,7 @@ class StringSplitter(CustomSplitMapMixin, BaseStringSplitter):
                 line we will construct.
             """
             result = self.line_length
-            result -= line.depth * 4
+            result -= line.depth * line.mode.tab_width
             result -= 1 if ends_with_comma else 0
             result -= 2 if line_needs_plus() else 0
             return result
@@ -3908,7 +3908,7 @@ class StringSplitter(CustomSplitMapMixin, BaseStringSplitter):
         # The last index of a string of length N is N-1.
         max_break_idx -= 1
         # Leading whitespace is not present in the string value (e.g. Leaf.value).
-        max_break_idx -= line.depth * 4
+        max_break_idx -= line.depth * line.mode.tab_width
         if max_break_idx < 0:
             yield TErr(
                 f"Unable to split {LL[string_idx].value} at such high of a line depth:"
@@ -4256,7 +4256,9 @@ class StringParenWrapper(CustomSplitMapMixin, BaseStringSplitter):
             # If the string has no spaces...
             if " " not in string_value:
                 # And will still violate the line length limit when split...
-                max_string_length = self.line_length - ((line.depth + 1) * 4)
+                max_string_length = self.line_length - (
+                    (line.depth + 1) * line.mode.tab_width
+                )
                 if len(string_value) > max_string_length:
                     # And has no associated custom splits...
                     if not self.has_custom_splits(string_value):
@@ -6085,7 +6087,7 @@ def generate_trailers_to_omit(line: Line, line_length: int) -> Iterator[Set[Leaf
     if not line.magic_trailing_comma:
         yield omit
 
-    length = 4 * line.depth
+    length = line.mode.tab_width * line.depth
     opening_bracket: Optional[Leaf] = None
     closing_bracket: Optional[Leaf] = None
     inner_brackets: Set[LeafID] = set()
@@ -6857,7 +6859,7 @@ def can_omit_invisible_parens(
 def _can_omit_opening_paren(line: Line, *, first: Leaf, line_length: int) -> bool:
     """See `can_omit_invisible_parens`."""
     remainder = False
-    length = 4 * line.depth
+    length = line.mode.tab_width * line.depth
     _index = -1
     for _index, leaf, leaf_length in enumerate_with_length(line):
         if leaf.type in CLOSING_BRACKETS and leaf.opening_bracket is first:
@@ -6881,7 +6883,7 @@ def _can_omit_opening_paren(line: Line, *, first: Leaf, line_length: int) -> boo
 
 def _can_omit_closing_paren(line: Line, *, last: Leaf, line_length: int) -> bool:
     """See `can_omit_invisible_parens`."""
-    length = 4 * line.depth
+    length = line.mode.tab_width * line.depth
     seen_other_brackets = False
     for _index, leaf, leaf_length in enumerate_with_length(line):
         length += leaf_length
