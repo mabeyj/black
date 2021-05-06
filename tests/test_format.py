@@ -106,24 +106,6 @@ class TestSimpleFormat(BlackBaseTestCase):
     def test_experimental_format(self, filename: str) -> None:
         self.check_file(filename, black.Mode(experimental_string_processing=True))
 
-    @patch("black.dump_to_file", dump_to_stderr)
-    def test_indentation_2_spaces(self) -> None:
-        source, expected = read_data("indentation_2_spaces")
-        mode = black.Mode(indentation="  ", tab_width=2)
-        actual = fs(source, mode=mode)
-        self.assertFormatEqual(expected, actual)
-        black.assert_equivalent(source, actual)
-        black.assert_stable(source, actual, mode)
-
-    @patch("black.dump_to_file", dump_to_stderr)
-    def test_indentation_tabs(self) -> None:
-        source, expected = read_data("indentation_tabs")
-        mode = black.Mode(indentation="\t")
-        actual = fs(source, mode=mode)
-        self.assertFormatEqual(expected, actual)
-        black.assert_equivalent(source, actual)
-        black.assert_stable(source, actual, mode)
-
     @parameterized.expand(SOURCES)
     @patch("black.dump_to_file", dump_to_stderr)
     def test_source_is_formatted(self, filename: str) -> None:
