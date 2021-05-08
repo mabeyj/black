@@ -4,7 +4,7 @@
 
 #### _Black_
 
-- Based on Black [21.5b0](#21.5b0).
+- Based on Black [21.5b0](#215b0).
 - Add `--use-tabs` / `-T` to indent with tabs instead of spaces.
 - Add `--tab-width` / `-w` to specify how many spaces a tab or indentation level represents (default: 4).
 
