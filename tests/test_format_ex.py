@@ -5,7 +5,6 @@ import black
 from tests.util import (
     BlackBaseTestCase,
     fs,
-    ff,
     dump_to_stderr,
     read_data,
 )
