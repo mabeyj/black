@@ -81,6 +81,7 @@ else:
 if TYPE_CHECKING:
     import colorama  # noqa: F401
 
+DEFAULT_TAB_WIDTH = 4
 DEFAULT_LINE_LENGTH = 88
 DEFAULT_EXCLUDES = r"/(\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|venv|\.svn|_build|buck-out|build|dist)/"  # noqa: B950
 DEFAULT_INCLUDES = r"\.pyi?$"
@@ -271,11 +272,17 @@ VERSION_TO_FEATURES: Dict[TargetVersion, Set[Feature]] = {
 @dataclass
 class Mode:
     target_versions: Set[TargetVersion] = field(default_factory=set)
+    indentation: str = " " * DEFAULT_TAB_WIDTH
+    tab_width: int = DEFAULT_TAB_WIDTH
     line_length: int = DEFAULT_LINE_LENGTH
     string_normalization: bool = True
     is_pyi: bool = False
     magic_trailing_comma: bool = True
     experimental_string_processing: bool = False
+
+    @property
+    def use_tabs(self) -> bool:
+        return "\t" in self.indentation
 
     def get_cache_key(self) -> str:
         if self.target_versions:
@@ -404,6 +411,20 @@ def validate_regex(
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option("-c", "--code", type=str, help="Format the code passed in as a string.")
+@click.option(
+    "-T",
+    "--use-tabs",
+    is_flag=True,
+    help="Indent with tabs instead of spaces.",
+)
+@click.option(
+    "-w",
+    "--tab-width",
+    type=int,
+    default=DEFAULT_TAB_WIDTH,
+    help="How many spaces per indentation level.",
+    show_default=True,
+)
 @click.option(
     "-l",
     "--line-length",
@@ -574,6 +595,8 @@ def validate_regex(
 def main(
     ctx: click.Context,
     code: Optional[str],
+    use_tabs: bool,
+    tab_width: int,
     line_length: int,
     target_version: List[TargetVersion],
     check: bool,
@@ -603,6 +626,8 @@ def main(
         versions = set()
     mode = Mode(
         target_versions=versions,
+        indentation="\t" if use_tabs else " " * tab_width,
+        tab_width=tab_width,
         line_length=line_length,
         is_pyi=pyi,
         string_normalization=not skip_string_normalization,
@@ -1851,7 +1876,7 @@ class Line:
         if not self:
             return "\n"
 
-        indent = "    " * self.depth
+        indent = self.mode.indentation * self.depth
         leaves = iter(self.leaves)
         first = next(leaves)
         res = f"{first.prefix}{indent}{first.value}"
@@ -2187,8 +2212,8 @@ class LineGenerator(Visitor[Line]):
             docstring = docstring[quote_len:-quote_len]
 
             if is_multiline_string(leaf):
-                indent = " " * 4 * self.current_line.depth
-                docstring = fix_docstring(docstring, indent)
+                indent = self.mode.indentation * self.current_line.depth
+                docstring = fix_docstring(docstring, indent, not self.mode.use_tabs)
             else:
                 docstring = docstring.strip()
 
@@ -3654,7 +3679,7 @@ class BaseStringSplitter(StringTransformer):
         #   NN: The leaf that is after N.
 
         # WMA4 the whitespace at the beginning of the line.
-        offset = line.depth * 4
+        offset = line.depth * line.mode.tab_width
 
         if is_valid_index(string_idx - 1):
             p_idx = string_idx - 1
@@ -3872,7 +3897,7 @@ class StringSplitter(CustomSplitMapMixin, BaseStringSplitter):
                 line we will construct.
             """
             result = self.line_length
-            result -= line.depth * 4
+            result -= line.depth * line.mode.tab_width
             result -= 1 if ends_with_comma else 0
             result -= 2 if line_needs_plus() else 0
             return result
@@ -3883,7 +3908,7 @@ class StringSplitter(CustomSplitMapMixin, BaseStringSplitter):
         # The last index of a string of length N is N-1.
         max_break_idx -= 1
         # Leading whitespace is not present in the string value (e.g. Leaf.value).
-        max_break_idx -= line.depth * 4
+        max_break_idx -= line.depth * line.mode.tab_width
         if max_break_idx < 0:
             yield TErr(
                 f"Unable to split {LL[string_idx].value} at such high of a line depth:"
@@ -4231,7 +4256,9 @@ class StringParenWrapper(CustomSplitMapMixin, BaseStringSplitter):
             # If the string has no spaces...
             if " " not in string_value:
                 # And will still violate the line length limit when split...
-                max_string_length = self.line_length - ((line.depth + 1) * 4)
+                max_string_length = self.line_length - (
+                    (line.depth + 1) * line.mode.tab_width
+                )
                 if len(string_value) > max_string_length:
                     # And has no associated custom splits...
                     if not self.has_custom_splits(string_value):
@@ -6060,7 +6087,7 @@ def generate_trailers_to_omit(line: Line, line_length: int) -> Iterator[Set[Leaf
     if not line.magic_trailing_comma:
         yield omit
 
-    length = 4 * line.depth
+    length = line.mode.tab_width * line.depth
     opening_bracket: Optional[Leaf] = None
     closing_bracket: Optional[Leaf] = None
     inner_brackets: Set[LeafID] = set()
@@ -6707,6 +6734,7 @@ def is_line_short_enough(line: Line, *, line_length: int, line_str: str = "") ->
     """
     if not line_str:
         line_str = line_to_string(line)
+    line_str = line_str.expandtabs(tabsize=line.mode.tab_width)
     return (
         len(line_str) <= line_length
         and "\n" not in line_str  # multiline strings
@@ -6831,7 +6859,7 @@ def can_omit_invisible_parens(
 def _can_omit_opening_paren(line: Line, *, first: Leaf, line_length: int) -> bool:
     """See `can_omit_invisible_parens`."""
     remainder = False
-    length = 4 * line.depth
+    length = line.mode.tab_width * line.depth
     _index = -1
     for _index, leaf, leaf_length in enumerate_with_length(line):
         if leaf.type in CLOSING_BRACKETS and leaf.opening_bracket is first:
@@ -6855,7 +6883,7 @@ def _can_omit_opening_paren(line: Line, *, first: Leaf, line_length: int) -> boo
 
 def _can_omit_closing_paren(line: Line, *, last: Leaf, line_length: int) -> bool:
     """See `can_omit_invisible_parens`."""
-    length = 4 * line.depth
+    length = line.mode.tab_width * line.depth
     seen_other_brackets = False
     for _index, leaf, leaf_length in enumerate_with_length(line):
         length += leaf_length
@@ -7057,11 +7085,14 @@ def lines_with_leading_tabs_expanded(s: str) -> List[str]:
     return lines
 
 
-def fix_docstring(docstring: str, prefix: str) -> str:
+def fix_docstring(docstring: str, prefix: str, expand_leading_tabs: bool) -> str:
     # https://www.python.org/dev/peps/pep-0257/#handling-docstring-indentation
     if not docstring:
         return ""
-    lines = lines_with_leading_tabs_expanded(docstring)
+    if expand_leading_tabs:
+        lines = lines_with_leading_tabs_expanded(docstring)
+    else:
+        lines = docstring.splitlines()
     # Determine minimum indentation (first line doesn't count):
     indent = sys.maxsize
     for line in lines[1:]:

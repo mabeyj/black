@@ -1,3 +1,18 @@
+## Black EX
+
+A fork of Black with extra options and features.
+
+### Extra options
+
+```text
+Options:
+  -T, --use-tabs                  Indent with tabs instead of spaces.
+  -w, --tab-width INTEGER         How many spaces per indentation level.
+                                  [default: 4]
+```
+
+---
+
 ![Black Logo](https://raw.githubusercontent.com/psf/black/master/docs/_static/logo2-readme.png)
 
 <h2 align="center">The Uncompromising Code Formatter</h2>
