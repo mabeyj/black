@@ -272,8 +272,8 @@ VERSION_TO_FEATURES: Dict[TargetVersion, Set[Feature]] = {
 @dataclass
 class Mode:
     target_versions: Set[TargetVersion] = field(default_factory=set)
-    indentation: str = "    "
-    tab_width: int = 4
+    indentation: str = " " * DEFAULT_TAB_WIDTH
+    tab_width: int = DEFAULT_TAB_WIDTH
     line_length: int = DEFAULT_LINE_LENGTH
     string_normalization: bool = True
     is_pyi: bool = False
