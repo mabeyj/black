@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import sys
 from concurrent.futures import Executor, ProcessPoolExecutor
 from datetime import datetime
 from functools import partial
@@ -11,15 +10,14 @@ try:
     from aiohttp import web
     import aiohttp_cors
 except ImportError as ie:
-    print(
+    raise ImportError(
         f"aiohttp dependency is not installed: {ie}. "
         + "Please re-install black with the '[d]' extra install "
-        + "to obtain aiohttp_cors: `pip install black[d]`",
-        file=sys.stderr,
-    )
-    sys.exit(-1)
+        + "to obtain aiohttp_cors: `pip install black[d]`"
+    ) from None
 
 import black
+from black.concurrency import maybe_install_uvloop
 import click
 
 from _black_version import version as __version__
@@ -202,6 +200,7 @@ def parse_python_variant_header(value: str) -> Tuple[bool, Set[black.TargetVersi
 
 
 def patched_main() -> None:
+    maybe_install_uvloop()
     freeze_support()
     black.patch_click()
     main()

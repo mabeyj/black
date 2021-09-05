@@ -7,11 +7,19 @@ from datetime import datetime
 from pathlib import Path
 from shutil import rmtree, which
 from tempfile import gettempdir
-from typing import Any, Union
+from typing import Any, Union, Optional
 
 import click
 
 from black_primer import lib
+
+# If our environment has uvloop installed lets use it
+try:
+    import uvloop
+
+    uvloop.install()
+except ImportError:
+    pass
 
 
 DEFAULT_CONFIG = Path(__file__).parent / "primer.json"
@@ -21,8 +29,8 @@ LOG = logging.getLogger(__name__)
 
 
 def _handle_debug(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
+    ctx: Optional[click.core.Context],
+    param: Optional[Union[click.core.Option, click.core.Parameter]],
     debug: Union[bool, int, str],
 ) -> Union[bool, int, str]:
     """Turn on debugging if asked otherwise INFO default"""
