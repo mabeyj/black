@@ -106,13 +106,16 @@ class PrimerLibTests(unittest.TestCase):
     def test_black_run(self) -> None:
         """Pretend to run Black to ensure we cater for all scenarios"""
         loop = asyncio.get_event_loop()
+        project_name = "unittest"
         repo_path = Path(gettempdir())
         project_config = deepcopy(FAKE_PROJECT_CONFIG)
         results = lib.Results({"failed": 0, "success": 0}, {})
 
         # Test a successful Black run
         with patch("black_primer.lib._gen_check_output", return_subproccess_output):
-            loop.run_until_complete(lib.black_run(repo_path, project_config, results))
+            loop.run_until_complete(
+                lib.black_run(project_name, repo_path, project_config, results)
+            )
         self.assertEqual(1, results.stats["success"])
         self.assertFalse(results.failed_projects)
 
@@ -120,7 +123,9 @@ class PrimerLibTests(unittest.TestCase):
         project_config["expect_formatting_changes"] = True
         results = lib.Results({"failed": 0, "success": 0}, {})
         with patch("black_primer.lib._gen_check_output", return_subproccess_output):
-            loop.run_until_complete(lib.black_run(repo_path, project_config, results))
+            loop.run_until_complete(
+                lib.black_run(project_name, repo_path, project_config, results)
+            )
         self.assertEqual(1, results.stats["failed"])
         self.assertTrue(results.failed_projects)
 
@@ -128,14 +133,23 @@ class PrimerLibTests(unittest.TestCase):
         project_config["expect_formatting_changes"] = False
         results = lib.Results({"failed": 0, "success": 0}, {})
         with patch("black_primer.lib._gen_check_output", raise_subprocess_error_1):
-            loop.run_until_complete(lib.black_run(repo_path, project_config, results))
+            loop.run_until_complete(
+                lib.black_run(project_name, repo_path, project_config, results)
+            )
         self.assertEqual(1, results.stats["failed"])
         self.assertTrue(results.failed_projects)
 
         # Test a formatting error based on returning 123
         with patch("black_primer.lib._gen_check_output", raise_subprocess_error_123):
-            loop.run_until_complete(lib.black_run(repo_path, project_config, results))
+            loop.run_until_complete(
+                lib.black_run(project_name, repo_path, project_config, results)
+            )
         self.assertEqual(2, results.stats["failed"])
+
+    def test_flatten_cli_args(self) -> None:
+        fake_long_args = ["--arg", ["really/", "|long", "|regex", "|splitup"], "--done"]
+        expected = ["--arg", "really/|long|regex|splitup", "--done"]
+        self.assertEqual(expected, lib._flatten_cli_args(fake_long_args))
 
     @event_loop()
     def test_gen_check_output(self) -> None:
@@ -175,12 +189,14 @@ class PrimerLibTests(unittest.TestCase):
     @patch("sys.stdout", new_callable=StringIO)
     @event_loop()
     def test_process_queue(self, mock_stdout: Mock) -> None:
+        """Test the process queue on primer itself
+        - If you have non black conforming formatting in primer itself this can fail"""
         loop = asyncio.get_event_loop()
         config_path = Path(lib.__file__).parent / "primer.json"
         with patch("black_primer.lib.git_checkout_or_rebase", return_false):
             with TemporaryDirectory() as td:
                 return_val = loop.run_until_complete(
-                    lib.process_queue(str(config_path), td, 2)
+                    lib.process_queue(str(config_path), Path(td), 2)
                 )
                 self.assertEqual(0, return_val)
 
@@ -201,7 +217,7 @@ class PrimerCLITests(unittest.TestCase):
             "no_diff": False,
         }
         with patch("black_primer.cli.lib.process_queue", return_zero):
-            return_val = loop.run_until_complete(cli.async_main(**args))
+            return_val = loop.run_until_complete(cli.async_main(**args))  # type: ignore
             self.assertEqual(0, return_val)
 
     def test_handle_debug(self) -> None:
