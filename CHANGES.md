@@ -8,6 +8,8 @@
 - Add `--use-tabs` / `-T` to indent with tabs instead of spaces. (#1)
 - Add `--tab-width` / `-w` to specify how many spaces a tab or indentation level
   represents (default: 4). (#1)
+- Add `--keep-blank-lines-in-brackets` to preserve single blank lines within brackets
+  (tuples, lists, dictionaries, function arguments, etc.). (#3)
 
 ---
 

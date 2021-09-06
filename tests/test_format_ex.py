@@ -21,6 +21,13 @@ class TestSimpleFormatEX(BlackBaseTestCase):
     def test_indentation_tabs(self) -> None:
         self.check_file("ex_indentation_tabs", black.Mode(indentation="\t"))
 
+    @patch("black.dump_to_file", dump_to_stderr)
+    def test_keep_blank_lines_in_brackets(self) -> None:
+        self.check_file(
+            "ex_keep_blank_lines_in_brackets",
+            black.Mode(keep_blank_lines_in_brackets=True),
+        )
+
     def check_file(self, filename: str, mode: black.Mode, *, data: bool = True) -> None:
         source, expected = read_data(filename, data=data)
         actual = fs(source, mode=mode)

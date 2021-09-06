@@ -7,6 +7,7 @@ from typing import Collection, Iterator, List, Optional, Set, Union
 
 from dataclasses import dataclass, field
 
+from black.nodes import COMMENTS
 from black.nodes import WHITESPACE, RARROW, STATEMENT, STANDALONE_COMMENT
 from black.nodes import ASSIGNMENTS, OPENING_BRACKETS, CLOSING_BRACKETS
 from black.nodes import Visitor, syms, first_child_is_arith, ensure_visible
@@ -72,10 +73,31 @@ class LineGenerator(Visitor[Line]):
         """Default `visit_*()` implementation. Recurses to children of `node`."""
         if isinstance(node, Leaf):
             any_open_brackets = self.current_line.bracket_tracker.any_open_brackets()
+            append_blank_lines = (
+                any_open_brackets and self.mode.keep_blank_lines_in_brackets
+            )
+
+            try:
+                last_leaf: Optional[Leaf] = self.current_line.leaves[-1]
+            except IndexError:
+                last_leaf = None
+
             for comment in generate_comments(node):
+                if (
+                    append_blank_lines
+                    and last_leaf
+                    and last_leaf.type not in OPENING_BRACKETS
+                ):
+                    newlines = comment.prefix.count("\n")
+                    if last_leaf and last_leaf.type in COMMENTS:
+                        newlines += 1
+                    if newlines > 1:
+                        self.current_line.append(Leaf(STANDALONE_COMMENT, ""))
+
                 if any_open_brackets:
                     # any comment within brackets is subject to splitting
                     self.current_line.append(comment)
+                    last_leaf = comment
                 elif comment.type == token.COMMENT:
                     # regular trailing comment
                     self.current_line.append(comment)
@@ -87,6 +109,15 @@ class LineGenerator(Visitor[Line]):
 
                     self.current_line.append(comment)
                     yield from self.line()
+
+            if (
+                append_blank_lines
+                and last_leaf
+                and last_leaf.type not in OPENING_BRACKETS
+                and node.type not in CLOSING_BRACKETS
+                and node.prefix.split("#")[-1].count("\n") > 1
+            ):
+                self.current_line.append(Leaf(STANDALONE_COMMENT, ""))
 
             normalize_prefix(node, inside_brackets=any_open_brackets)
             if self.mode.string_normalization and node.type == token.STRING:

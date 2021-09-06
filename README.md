@@ -9,6 +9,9 @@ Options:
   -T, --use-tabs                  Indent with tabs instead of spaces.
   -w, --tab-width INTEGER         How many spaces per indentation level.
                                   [default: 4]
+  --keep-blank-lines-in-brackets  Preserve single blank lines inside brackets
+                                  (tuples, lists, dictionaries, function
+                                  arguments, etc.).
 ```
 
 ---
