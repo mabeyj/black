@@ -106,6 +106,7 @@ class Mode:
     is_ipynb: bool = False
     magic_trailing_comma: bool = True
     experimental_string_processing: bool = False
+    keep_blank_lines_in_brackets: bool = False
 
     @property
     def use_tabs(self) -> bool:

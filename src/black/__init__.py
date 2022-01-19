@@ -253,6 +253,14 @@ def validate_regex(
     ),
 )
 @click.option(
+    "--keep-blank-lines-in-brackets",
+    is_flag=True,
+    help=(
+        "Preserve single blank lines inside brackets (tuples, lists, "
+        "dictionaries, function arguments, etc.)."
+    ),
+)
+@click.option(
     "--check",
     is_flag=True,
     help=(
@@ -396,6 +404,7 @@ def main(
     skip_string_normalization: bool,
     skip_magic_trailing_comma: bool,
     experimental_string_processing: bool,
+    keep_blank_lines_in_brackets: bool,
     quiet: bool,
     verbose: bool,
     required_version: str,
@@ -438,6 +447,7 @@ def main(
         string_normalization=not skip_string_normalization,
         magic_trailing_comma=not skip_magic_trailing_comma,
         experimental_string_processing=experimental_string_processing,
+        keep_blank_lines_in_brackets=keep_blank_lines_in_brackets,
     )
 
     if code is not None:

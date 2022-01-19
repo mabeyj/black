@@ -53,6 +53,7 @@ STATEMENT: Final = {
 }
 STANDALONE_COMMENT: Final = 153
 token.tok_name[STANDALONE_COMMENT] = "STANDALONE_COMMENT"
+COMMENTS: Final = {token.COMMENT, STANDALONE_COMMENT}
 LOGIC_OPERATORS: Final = {"and", "or"}
 COMPARATORS: Final = {
     token.LESS,
