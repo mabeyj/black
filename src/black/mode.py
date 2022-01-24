@@ -157,11 +157,14 @@ class Mode:
             version_str = "-"
         parts = [
             version_str,
+            str(int(self.use_tabs)),
+            str(self.tab_width),
             str(self.line_length),
             str(int(self.string_normalization)),
             str(int(self.is_pyi)),
             str(int(self.is_ipynb)),
             str(int(self.magic_trailing_comma)),
             str(int(self.experimental_string_processing)),
+            str(int(self.keep_blank_lines_in_brackets)),
         ]
         return ".".join(parts)
