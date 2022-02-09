@@ -2,6 +2,11 @@ x["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 x[x["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"] or "xxxxxxx"] = "xxxxxxxxxxxxxxxxxxxxxxxxx"
 
+x[
+    0
+    # comment
+] = x["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
 if xxxxxxxxxxxxxxxxxxxxxxxxxx in ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"]:
     pass
 
@@ -14,6 +19,13 @@ x["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"] = (
 x[x["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"] or "xxxxxxx"] = (
     "xxxxxxxxxxxxxxxxxxxxxxxxx"
 )
+
+x[
+    0
+    # comment
+] = (
+    x["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"]
+) = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 if xxxxxxxxxxxxxxxxxxxxxxxxxx in [
     "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
