@@ -274,7 +274,9 @@ def validate_regex(
 @click.option(
     "--prefer-no-split-subscripts",
     is_flag=True,
-    help="Prefer not splitting subscripts into multiple lines.",
+    help=(
+        "Prefer not splitting subscripts into multiple lines in assignment statements."
+    ),
 )
 @click.option(
     "--check",

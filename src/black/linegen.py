@@ -506,7 +506,7 @@ def right_hand_split(
 
     Note: running this function modifies `bracket_depth` on the leaves of `line`.
     """
-    if line.mode.prefer_no_split_subscripts:
+    if line.mode.prefer_no_split_subscripts and line.is_assignment:
         follows_name = False
         is_subscript = []
         for leaf in line.leaves:

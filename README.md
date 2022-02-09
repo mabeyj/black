@@ -13,7 +13,7 @@ Options:
                                   (tuples, lists, dictionaries, function
                                   arguments, etc.).
   --prefer-no-split-subscripts    Prefer not splitting subscripts into
-                                  multiple lines.
+                                  multiple lines in assignment statements.
 ```
 
 #### `--prefer-no-split-subscripts`
