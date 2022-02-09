@@ -272,6 +272,11 @@ def validate_regex(
     ),
 )
 @click.option(
+    "--prefer-no-split-subscripts",
+    is_flag=True,
+    help="Prefer not splitting subscripts into multiple lines.",
+)
+@click.option(
     "--check",
     is_flag=True,
     help=(
@@ -427,6 +432,7 @@ def main(
     skip_magic_trailing_comma: bool,
     experimental_string_processing: bool,
     keep_blank_lines_in_brackets: bool,
+    prefer_no_split_subscripts: bool,
     quiet: bool,
     verbose: bool,
     required_version: Optional[str],
@@ -471,6 +477,7 @@ def main(
         magic_trailing_comma=not skip_magic_trailing_comma,
         experimental_string_processing=experimental_string_processing,
         keep_blank_lines_in_brackets=keep_blank_lines_in_brackets,
+        prefer_no_split_subscripts=prefer_no_split_subscripts,
     )
 
     if code is not None:

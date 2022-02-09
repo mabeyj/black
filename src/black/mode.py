@@ -142,6 +142,7 @@ class Mode:
     magic_trailing_comma: bool = True
     experimental_string_processing: bool = False
     keep_blank_lines_in_brackets: bool = False
+    prefer_no_split_subscripts: bool = False
 
     @property
     def use_tabs(self) -> bool:
@@ -166,5 +167,6 @@ class Mode:
             str(int(self.magic_trailing_comma)),
             str(int(self.experimental_string_processing)),
             str(int(self.keep_blank_lines_in_brackets)),
+            str(int(self.prefer_no_split_subscripts)),
         ]
         return ".".join(parts)

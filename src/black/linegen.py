@@ -506,6 +506,16 @@ def right_hand_split(
 
     Note: running this function modifies `bracket_depth` on the leaves of `line`.
     """
+    if line.mode.prefer_no_split_subscripts:
+        follows_name = False
+        is_subscript = []
+        for leaf in line.leaves:
+            if leaf.type == token.LSQB:
+                is_subscript.append(follows_name)
+            if leaf.type == token.RSQB and is_subscript.pop():
+                omit = {id(leaf), *omit}
+            follows_name = leaf.type == token.NAME
+
     tail_leaves: List[Leaf] = []
     body_leaves: List[Leaf] = []
     head_leaves: List[Leaf] = []
