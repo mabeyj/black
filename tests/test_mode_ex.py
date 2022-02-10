@@ -15,5 +15,5 @@ def test_get_cache_key() -> None:
         tab_width=4,
         keep_blank_lines_in_brackets=True,
     ).get_cache_key()
-    expected = "-.1.4.88.1.0.0.1.0.1"
+    expected = "-.1.4.88.1.0.0.1.0.1.0.d41d8cd98f00b204e9800998ecf8427e"
     assert result == expected
