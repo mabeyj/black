@@ -12,8 +12,8 @@ Options:
   --keep-blank-lines-in-brackets  Preserve single blank lines inside brackets
                                   (tuples, lists, dictionaries, function
                                   arguments, etc.).
-  --prefer-no-split-subscripts    Prefer not splitting subscripts into
-                                  multiple lines in assignment statements.
+  --prefer-no-split-subscripts    Prefer not splitting tuple/list/dictionary
+                                  subscripts into multiple lines.
 ```
 
 #### `--prefer-no-split-subscripts`

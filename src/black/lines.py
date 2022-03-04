@@ -172,11 +172,6 @@ class Line:
             and self.leaves[0].value.startswith(('"""', "'''"))
         )
 
-    @property
-    def is_assignment(self) -> bool:
-        """Is this line an assignment?"""
-        return any(leaf.type == token.EQUAL for leaf in self.leaves)
-
     def contains_standalone_comments(self, depth_limit: int = sys.maxsize) -> bool:
         """If so, needs to be split before emitting."""
         for leaf in self.leaves:

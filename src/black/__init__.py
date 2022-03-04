@@ -292,9 +292,7 @@ def validate_regex(
 @click.option(
     "--prefer-no-split-subscripts",
     is_flag=True,
-    help=(
-        "Prefer not splitting subscripts into multiple lines in assignment statements."
-    ),
+    help="Prefer not splitting tuple/list/dictionary subscripts into multiple lines.",
 )
 @click.option(
     "--check",
