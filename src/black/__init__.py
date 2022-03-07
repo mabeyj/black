@@ -290,7 +290,7 @@ def validate_regex(
     ),
 )
 @click.option(
-    "--prefer-no-split-subscripts",
+    "--no-split-subscripts",
     is_flag=True,
     help="Prefer not splitting tuple/list/dictionary subscripts into multiple lines.",
 )
@@ -451,7 +451,7 @@ def main(
     skip_magic_trailing_comma: bool,
     experimental_string_processing: bool,
     keep_blank_lines_in_brackets: bool,
-    prefer_no_split_subscripts: bool,
+    no_split_subscripts: bool,
     preview: bool,
     quiet: bool,
     verbose: bool,
@@ -537,7 +537,7 @@ def main(
         magic_trailing_comma=not skip_magic_trailing_comma,
         experimental_string_processing=experimental_string_processing,
         keep_blank_lines_in_brackets=keep_blank_lines_in_brackets,
-        prefer_no_split_subscripts=prefer_no_split_subscripts,
+        split_subscripts=not no_split_subscripts,
         preview=preview,
         python_cell_magics=set(python_cell_magics),
     )

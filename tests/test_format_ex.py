@@ -29,11 +29,8 @@ class TestSimpleFormatEX(BlackBaseTestCase):
         )
 
     @patch("black.dump_to_file", dump_to_stderr)
-    def test_prefer_no_split_subscripts(self) -> None:
-        self.check_file(
-            "ex_prefer_no_split_subscripts",
-            black.Mode(prefer_no_split_subscripts=True),
-        )
+    def test_no_split_subscripts(self) -> None:
+        self.check_file("ex_no_split_subscripts", black.Mode(split_subscripts=False))
 
     def check_file(self, filename: str, mode: black.Mode, *, data: bool = True) -> None:
         source, expected = read_data(filename, data=data)

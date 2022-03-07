@@ -615,9 +615,9 @@ def get_best_right_hand_split_without_subscripts(
     line: Line, features: Collection[Feature]
 ) -> Optional[List[Line]]:
     """Return a right-hand split of the given line without spliting on
-    subscripts or None if --prefer-no-split-subscripts is disabled or there is
-    no split that results in a short enough first line."""
-    if not line.mode.prefer_no_split_subscripts:
+    subscripts or None if --no-split-subscripts is disabled or there is no split
+    that results in a short enough first line."""
+    if line.mode.split_subscripts:
         return None
 
     subscript_omit = get_omitted_subscript_bracket_ids(line)
@@ -641,8 +641,8 @@ def get_best_right_hand_split_without_subscripts(
 
 
 def get_omitted_subscript_bracket_ids(line: Line) -> Set[LeafID]:
-    """Return leaf IDs of subscript closing brackets that should be
-    omitted when --prefer-no-split-subscripts is enabled."""
+    """Return leaf IDs of subscript closing brackets that should be omitted when
+    --no-split-subscripts is enabled."""
     ids = set()
     max_length = line.mode.line_length - line.mode.tab_width * line.depth - len(" = (")
     length = 0
