@@ -14,6 +14,10 @@ x["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx = xxxxxxxxxx[xxxxxxxxxx]
 
+xxxxxxxxxxx = xxxxxxxxxxxxxxx[x(xxxxxxxxxxx[xxxxxxxxxxx].xxxxxxxxxxxx(xxxxxxxxxxxxxxxxxxxxxxxx))]
+
+xxxxxxxxxxx = xxxxxxxxxxxxxxx[x(xxxxxxxxxxx[xxxxxxxxxxx].xxxxxxxxxxxx(xxxxxxxxxxxxxxxxxxxxxxxxx))]
+
 xxxxxxxxxx["xxxxxxxxxx"] = xxxxxxxxxx["xxxxxxxxxx"] = xxxxxxxxxx["xxxxxxxxxx"] = xxxxxxxxxx["xxxxxxxxxx"] = xxxxxxxxxx["xxxxxxxxxx"] = xxxxxxxxxx["xxxxxxxxxx"]
 
 x[
@@ -23,6 +27,10 @@ x[
 
 if xxxxxxxxxxxxxxxxxxxxxxxxxx in ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"]:
     pass
+
+return xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+
+return xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
 
 # output
 
@@ -59,6 +67,14 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx = (
     xxxxxxxxxx[xxxxxxxxxx]
 )
 
+xxxxxxxxxxx = (
+    xxxxxxxxxxxxxxx[x(xxxxxxxxxxx[xxxxxxxxxxx].xxxxxxxxxxxx(xxxxxxxxxxxxxxxxxxxxxxxx))]
+)
+
+xxxxxxxxxxx = xxxxxxxxxxxxxxx[
+    x(xxxxxxxxxxx[xxxxxxxxxxx].xxxxxxxxxxxx(xxxxxxxxxxxxxxxxxxxxxxxxx))
+]
+
 xxxxxxxxxx["xxxxxxxxxx"] = (
     xxxxxxxxxx["xxxxxxxxxx"]
 ) = (
@@ -76,3 +92,9 @@ if xxxxxxxxxxxxxxxxxxxxxxxxxx in [
     "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ]:
     pass
+
+return xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+
+return xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+]

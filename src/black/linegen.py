@@ -644,6 +644,7 @@ def get_omitted_subscript_bracket_ids(line: Line) -> Set[LeafID]:
     """Return leaf IDs of subscript closing brackets that should be omitted when
     --no-split-subscripts is enabled."""
     ids = set()
+    inner_ids = set()
     length = 0
     max_length = line.mode.line_length - line.mode.tab_width * line.depth - len(" = (")
     subscriptable = False
@@ -657,13 +658,12 @@ def get_omitted_subscript_bracket_ids(line: Line) -> Set[LeafID]:
             brackets.append(
                 leaf.type == token.LSQB and not leaf.prefix and subscriptable
             )
-        if (
-            leaf.type in CLOSING_BRACKETS
-            and brackets
-            and brackets.pop()
-            and length <= max_length
-        ):
-            ids.add(id(leaf))
+        if leaf.type in CLOSING_BRACKETS and brackets:
+            inner_ids.add(id(leaf))
+            if brackets.pop() and length <= max_length:
+                ids |= inner_ids
+            if not brackets:
+                inner_ids = set()
 
         subscriptable = leaf.type in [token.NAME, token.RSQB]
         if not subscriptable and not brackets:
