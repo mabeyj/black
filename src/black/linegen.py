@@ -650,7 +650,9 @@ def get_omitted_subscript_bracket_ids(line: Line) -> Set[LeafID]:
     subscriptable = False
     brackets = []
     for leaf in line.leaves:
-        length += len(leaf.prefix) + len(leaf.value)
+        if length:
+            length += len(leaf.prefix)
+        length += len(leaf.value)
         if leaf.type == STANDALONE_COMMENT or "\n" in leaf.value:
             length += max_length
 
