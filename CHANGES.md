@@ -10,6 +10,8 @@
   represents (default: 4). (#1)
 - Add `--keep-blank-lines-in-brackets` to preserve single blank lines within brackets
   (tuples, lists, dictionaries, function arguments, etc.). (#3)
+- Add `--no-split-subscripts` to prefer not splitting tuple/list/dictionary subscripts
+  into multiple lines. (#6)
 
 ---
 

@@ -412,6 +412,11 @@ def transform_line(
             content), meaning the trailers get glued together to split on another
             bracket pair instead.
             """
+            lines = get_best_right_hand_split_without_subscripts(line, features)
+            if lines:
+                yield from lines
+                return
+
             for omit in generate_trailers_to_omit(line, mode.line_length):
                 lines = list(
                     right_hand_split(line, mode.line_length, features, omit=omit)
@@ -604,6 +609,69 @@ def right_hand_split(
     for result in (head, body, tail):
         if result:
             yield result
+
+
+def get_best_right_hand_split_without_subscripts(
+    line: Line, features: Collection[Feature]
+) -> Optional[List[Line]]:
+    """Return a right-hand split of the given line without spliting on
+    subscripts or None if --no-split-subscripts is disabled or there is no split
+    that results in a short enough first line."""
+    if line.mode.split_subscripts:
+        return None
+
+    subscript_omit = get_omitted_subscript_bracket_ids(line)
+    if not subscript_omit:
+        return None
+
+    for omit in generate_trailers_to_omit(line, line.mode.line_length):
+        try:
+            lines = list(
+                right_hand_split(
+                    line, line.mode.line_length, features, omit=subscript_omit | omit
+                )
+            )
+        except CannotSplit:
+            return None
+
+        if is_line_short_enough(lines[0], line_length=line.mode.line_length):
+            return lines
+
+    return None
+
+
+def get_omitted_subscript_bracket_ids(line: Line) -> Set[LeafID]:
+    """Return leaf IDs of subscript closing brackets that should be omitted when
+    --no-split-subscripts is enabled."""
+    ids = set()
+    inner_ids = set()
+    length = 0
+    max_length = line.mode.line_length - line.mode.tab_width * line.depth - len(" = (")
+    subscriptable = False
+    brackets = []
+    for leaf in line.leaves:
+        if length:
+            length += len(leaf.prefix)
+        length += len(leaf.value)
+        if leaf.type == STANDALONE_COMMENT or "\n" in leaf.value:
+            length += max_length
+
+        if leaf.type in OPENING_BRACKETS:
+            brackets.append(
+                leaf.type == token.LSQB and not leaf.prefix and subscriptable
+            )
+        if leaf.type in CLOSING_BRACKETS and brackets:
+            inner_ids.add(id(leaf))
+            if brackets.pop() and length <= max_length:
+                ids |= inner_ids
+            if not brackets:
+                inner_ids = set()
+
+        subscriptable = leaf.type in [token.NAME, token.RSQB]
+        if not subscriptable and not brackets:
+            length = 0
+
+    return ids
 
 
 def bracket_split_succeeded_or_raise(head: Line, body: Line, tail: Line) -> None:

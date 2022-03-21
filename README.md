@@ -12,6 +12,25 @@ Options:
   --keep-blank-lines-in-brackets  Preserve single blank lines inside brackets
                                   (tuples, lists, dictionaries, function
                                   arguments, etc.).
+  --no-split-subscripts           Prefer not splitting tuple/list/dictionary
+                                  subscripts into multiple lines.
+```
+
+#### `--no-split-subscripts`
+
+```python
+# Input:
+x["xxxxxxxxxxxxxxx"] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Without --no-split-subscripts:
+x[
+    "xxxxxxxxxxxxxxx"
+] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# With --no-split-subscripts:
+x["xxxxxxxxxxxxxxx"] = (
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+)
 ```
 
 ---

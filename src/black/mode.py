@@ -146,6 +146,7 @@ class Mode:
     magic_trailing_comma: bool = True
     experimental_string_processing: bool = False
     keep_blank_lines_in_brackets: bool = False
+    split_subscripts: bool = True
     python_cell_magics: Set[str] = field(default_factory=set)
     preview: bool = False
 
@@ -191,6 +192,7 @@ class Mode:
             str(int(self.magic_trailing_comma)),
             str(int(self.experimental_string_processing)),
             str(int(self.keep_blank_lines_in_brackets)),
+            str(int(self.split_subscripts)),
             str(int(self.preview)),
             md5((",".join(sorted(self.python_cell_magics))).encode()).hexdigest(),
         ]
